@@ -16,10 +16,6 @@ export default function Index() {
     const [theme, setTheme] = useState(ThemeName.BNR);
     const [embedCode, setEmbedCode] = useState('');
 
-    function handleWidgetTypeChanged(playerType: PlayerType) {
-        setPlayerType(playerType);
-    }
-
     /**
      * Helper method to join the ids of the items in the playlist as a comma-separated
      * string and encode it for use in a URL.
@@ -91,7 +87,7 @@ export default function Index() {
         setEmbedCode(
             `<iframe dummy-height="${getPlayerHeight(
                 playerType
-            )}" src="${playerUrl}&showSponsor=${hasSponsor}&colors=${getThemeColors(
+            )}" width="300" src="${playerUrl}&showSponsor=${hasSponsor}&colors=${getThemeColors(
                 theme
             )}" frameBorder="0"/>`
         );
@@ -103,7 +99,7 @@ export default function Index() {
                 <h1>FDMG Widget Generator architecture</h1>
                 <WidgetTypes
                     defaultValue={playerType}
-                    onChange={handleWidgetTypeChanged}
+                    onChange={setPlayerType}
                 />
                 {playerType === 'podcast' ? (
                     <PodcastList onPodcastChange={handlePlayerTypeChange} />
