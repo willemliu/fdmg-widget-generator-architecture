@@ -50,13 +50,13 @@ export function Playlist(props: Props) {
             return;
         }
 
-        const items = reorder(
+        const newPlaylist = reorder(
             playlist,
             result.source.index,
             result.destination.index
         );
 
-        setPlaylist(items);
+        setPlaylist(newPlaylist);
     }
 
     function addItem() {
