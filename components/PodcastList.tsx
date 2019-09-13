@@ -1,12 +1,13 @@
 import { useEffect, useState, ChangeEvent } from 'react';
-import { PODCASTS } from '../mocks/podcasts';
+import { PODCASTS, PodcastType } from '../mocks/podcasts';
 
 interface Props {
     onPodcastChange: (url: string) => void;
+    onSponsorLength: (sponsorLength: number) => void;
 }
 
 export function PodcastList(props: Props) {
-    const [podcasts, setPodcasts] = useState([]);
+    const [podcasts, setPodcasts] = useState<PodcastType[]>([]);
     // Same as componentDidMount
     useEffect(() => {
         // Do your fetch data here. We mock this for now.
@@ -15,12 +16,16 @@ export function PodcastList(props: Props) {
         props.onPodcastChange(
             `https://dev.bnr.nl${PODCASTS[0].programUrl}/json`
         );
+        props.onSponsorLength(PODCASTS[0].sponsors.length);
     }, []);
 
     function handlePodcastChange(event: ChangeEvent<HTMLSelectElement>) {
-        props.onPodcastChange(
-            `https://dev.bnr.nl${event.currentTarget.value}/json`
+        const programUrl = event.currentTarget.value;
+        props.onPodcastChange(`https://dev.bnr.nl${programUrl}/json`);
+        const podcast = podcasts.filter(
+            (podcast) => podcast.programUrl === programUrl
         );
+        props.onSponsorLength(podcast[0].sponsors.length);
     }
 
     return (

@@ -1,4 +1,17 @@
-export const PODCASTS = [
+export interface PodcastType {
+    title: string;
+    intro: string;
+    websiteUrl: string;
+    artworkUrl: string;
+    brandedPodcast: boolean;
+    programType: string;
+    programTitle: string;
+    programUrl: string;
+    sponsors: any[];
+    episodes: any[];
+}
+
+export const PODCASTS: PodcastType[] = [
     {
         title: null,
         intro: null,

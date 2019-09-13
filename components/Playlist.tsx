@@ -24,6 +24,10 @@ export function Playlist(props: Props) {
         props.onPlaylistChange(playlist);
     }, [playlist]);
 
+    /**
+     * Handle search input changes.
+     * @param event
+     */
     function onSearchChange(event: ChangeEvent<HTMLInputElement>) {
         if (debounceTimeout) {
             clearTimeout(debounceTimeout);
@@ -55,6 +59,9 @@ export function Playlist(props: Props) {
         return result;
     }
 
+    /**
+     * Persist the result of the dragging of items in the playlist.
+     */
     function onDragEnd(result: DropResult) {
         // dropped outside the list
         if (!result.destination) {
@@ -70,6 +77,9 @@ export function Playlist(props: Props) {
         setPlaylist(newPlaylist);
     }
 
+    /**
+     * Add selected item to the playlist
+     */
     function addItem() {
         // Add the item to the list.
         const itemToBeAdded = itemList.find(

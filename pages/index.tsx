@@ -15,15 +15,17 @@ export default function Index() {
     const [playerModel, setPlayerModel] = useState('');
     const [theme, setTheme] = useState(ThemeName.BNR);
     const [embedCode, setEmbedCode] = useState('');
+    const [sponsorCount, setSponsorCount] = useState(0);
+    const [episodeCount, setEpisodeCount] = useState(0);
 
     /**
      * Helper method to join the ids of the items in the playlist as a comma-separated
-     * string and encode it for use in a URL.
+     * string.
      * @param playlist
      */
     function getUriFromPlaylist(playlist: Fragment[]) {
         const uri = playlist.map((item) => item.id).join();
-        return encodeURIComponent(uri);
+        return uri;
     }
 
     /**
@@ -51,20 +53,39 @@ export default function Index() {
     }
 
     /**
-     * Mocked calculation of the height of the iframe player
+     * Calculate sponsor height. Only podcast sponsor height can differ.
+     */
+    function getSponsorHeight() {
+        let sponsorHeight = 85;
+        if (!hasSponsor) {
+            sponsorHeight = 0;
+        } else if (playerType === 'podcast' && sponsorCount > 1) {
+            sponsorHeight = 120;
+        }
+        return sponsorHeight;
+    }
+
+    /**
+     * Calculation of the height of the iframe player as digested from
+     * the original FDMG Widget Generator. However it seems that the playlist
+     * player should always be 125px in height. The embedded player doesn't shrink
+     * when episodeCount < 5 causing scrollbars to appear.
+     * Same goes for the Fragment player.
+     * So I'm questioning the validity of these calculations.
      *
      * @param playerType
      */
     function getPlayerHeight(playerType: PlayerType) {
-        const sponsorHeight = hasSponsor ? 3 : 0;
-        switch (playerType) {
-            case 'fragment':
-                return 10 + sponsorHeight;
-            case 'playlist':
-                return 20 + sponsorHeight;
-            case 'podcast':
-                return 30 + sponsorHeight;
+        const widgetBaseHeight = 67;
+        const sponsorHeight = getSponsorHeight();
+        let playerHeight = 125;
+        if (playerType === 'playlist') {
+            playerHeight = episodeCount > 4 ? 125 : episodeCount * 25;
+        } else if (playerType === 'fragment') {
+            playerHeight = episodeCount > 2 ? 125 : 50;
         }
+
+        return widgetBaseHeight + playerHeight + sponsorHeight;
     }
 
     /**
@@ -75,17 +96,19 @@ export default function Index() {
     useEffect(() => {
         const playerModel = JSON.stringify(
             {
+                height: getPlayerHeight(playerType),
                 playerType,
                 playerUrl,
                 hasSponsor,
                 theme,
+                colors: getThemeColors(theme),
             },
             null,
             2
         );
         setPlayerModel(playerModel);
         setEmbedCode(
-            `<iframe dummy-height="${getPlayerHeight(
+            `<iframe height="${getPlayerHeight(
                 playerType
             )}" width="300" src="${playerUrl}&showSponsor=${hasSponsor}&colors=${getThemeColors(
                 theme
@@ -102,12 +125,16 @@ export default function Index() {
                     onChange={setPlayerType}
                 />
                 {playerType === 'podcast' ? (
-                    <PodcastList onPodcastChange={handlePlayerTypeChange} />
+                    <PodcastList
+                        onPodcastChange={handlePlayerTypeChange}
+                        onSponsorLength={setSponsorCount}
+                    />
                 ) : null}
 
                 {playerType === 'fragment' ? (
                     <EpisodeFragment
                         onEpisodeFragmentChange={handlePlayerTypeChange}
+                        onEpisodeCount={setEpisodeCount}
                     />
                 ) : null}
 

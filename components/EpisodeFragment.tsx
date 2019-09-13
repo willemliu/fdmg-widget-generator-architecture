@@ -3,9 +3,36 @@ import { ChangeEvent, useEffect, useState, useRef } from 'react';
 
 interface Props {
     onEpisodeFragmentChange: (url: string) => void;
+    onEpisodeCount: (episodeCount: number) => void;
 }
 
 let debounceTimeout: NodeJS.Timeout;
+
+export interface Episode {
+    title: string;
+    intro: string;
+    websiteUrl: string;
+    artworkUrl: string;
+    brandedPodcast: boolean;
+    sponsors: any[];
+    episodes: [
+        {
+            title: string;
+            link: string;
+            summary: string;
+            publicationDate: string;
+            media: [
+                {
+                    type: string;
+                    url: string;
+                    title: string;
+                    duration: number;
+                    length: number;
+                }
+            ];
+        }
+    ];
+}
 
 export interface Fragment {
     id: number;
@@ -101,6 +128,11 @@ export function EpisodeFragment(props: Props) {
             props.onEpisodeFragmentChange(
                 `https://dev.bnr.nl/podcast/json/${itemToBeSet.id}`
             );
+            fetch(`https://dev.bnr.nl/podcast/json/${itemToBeSet.id}`)
+                .then((res) => res.json())
+                .then((json: Episode) => {
+                    props.onEpisodeCount(json.episodes.length);
+                });
         }
     }
 
@@ -116,8 +148,12 @@ export function EpisodeFragment(props: Props) {
                 },
             })
                 .then((res) => res.json())
-                .then((json) => {
-                    setSearchResults(json);
+                .then((json: Fragment[]) => {
+                    const onlyAudioItems = json.filter(
+                        (fragment) => fragment.audio
+                    );
+
+                    setSearchResults(onlyAudioItems);
                 });
         }, 300);
     }
