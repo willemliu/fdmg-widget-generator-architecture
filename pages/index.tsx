@@ -42,6 +42,7 @@ export default function Index() {
             case 'playlist':
                 // Process the playlist
                 if (typeof urlOrPlaylist === 'object') {
+                    setEpisodeCount(urlOrPlaylist.length);
                     setPlayerUrl(
                         `${baseUrl}?playlistItemsUrl=https://dev.bnr.nl/podcast/json/ids&items=${getUriFromPlaylist(
                             urlOrPlaylist
@@ -79,10 +80,13 @@ export default function Index() {
         const widgetBaseHeight = 67;
         const sponsorHeight = getSponsorHeight();
         let playerHeight = 125;
-        if (playerType === 'playlist') {
-            playerHeight = episodeCount > 4 ? 125 : episodeCount * 25;
-        } else if (playerType === 'fragment') {
-            playerHeight = episodeCount > 2 ? 125 : 50;
+        switch (playerType) {
+            case 'playlist':
+                playerHeight = episodeCount > 4 ? 125 : episodeCount * 25;
+                break;
+            case 'fragment':
+                playerHeight = episodeCount > 2 ? 125 : 50;
+                break;
         }
 
         return widgetBaseHeight + playerHeight + sponsorHeight;
