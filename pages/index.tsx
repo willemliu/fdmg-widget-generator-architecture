@@ -68,6 +68,11 @@ export default function Index() {
         }
     }
 
+    /**
+     * This useEffect listens to all the states which affects the BNR Player.
+     * Generates the iFrame code and for convenience also the player data-model if
+     * for any reason you'd want to have a JSON representation of the player.
+     */
     useEffect(() => {
         const playerModel = JSON.stringify(
             {
