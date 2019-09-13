@@ -57,22 +57,20 @@ export default function Index() {
      * Calculate sponsor height. Only podcast sponsor height can differ.
      */
     function getSponsorHeight() {
-        let sponsorHeight = 85;
+        let sponsorHeight = 0;
         if (!hasSponsor) {
             sponsorHeight = 0;
         } else if (playerType === 'podcast' && sponsorCount > 1) {
             sponsorHeight = 120;
+        } else if (sponsorCount === 1) {
+            sponsorHeight = 85;
         }
         return sponsorHeight;
     }
 
     /**
      * Calculation of the height of the iframe player as digested from
-     * the original FDMG Widget Generator. However it seems that the playlist
-     * player should always be 125px in height. The embedded player doesn't shrink
-     * when episodeCount < 5 causing scrollbars to appear.
-     * Same goes for the Fragment player.
-     * So I'm questioning the validity of these calculations.
+     * the original FDMG Widget Generator.
      *
      * @param playerType
      */
@@ -101,9 +99,10 @@ export default function Index() {
         const playerModel = JSON.stringify(
             {
                 height: getPlayerHeight(playerType),
+                episodeCount,
                 playerType,
-                playerUrl,
                 hasSponsor,
+                playerUrl,
                 theme,
                 colors: getThemeColors(theme),
             },
@@ -116,7 +115,7 @@ export default function Index() {
                 playerType
             )}" width="300" src="${playerUrl}&showSponsor=${hasSponsor}&colors=${getThemeColors(
                 theme
-            )}" frameBorder="0"/>`
+            )}" frameBorder="0" scrolling="no"/>`
         );
     }, [playerType, playerUrl, hasSponsor, theme]);
 
