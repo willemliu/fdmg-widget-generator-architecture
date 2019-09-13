@@ -20,7 +20,6 @@ export function Playlist(props: Props) {
     const [itemList, setItemList] = useState<PlaylistItem[]>([]);
     const [playlist, setPlaylist] = useState([]);
     const itemListRef = useRef(null);
-    const playlistRef = useRef(null);
 
     useEffect(() => {
         props.onPlaylistChange(playlist);
