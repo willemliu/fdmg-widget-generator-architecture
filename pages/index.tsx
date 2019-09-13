@@ -25,7 +25,7 @@ export default function Index() {
         return encodeURIComponent(uri);
     }
 
-    function handlePlayerChange(urlOrPlaylist: string | Fragment[]) {
+    function handlePlayerTypeChange(urlOrPlaylist: string | Fragment[]) {
         switch (playerType) {
             case 'podcast':
             case 'fragment':
@@ -98,17 +98,17 @@ export default function Index() {
                     onChange={handleWidgetTypeChanged}
                 />
                 {playerType === 'podcast' ? (
-                    <PodcastList onPodcastChange={handlePlayerChange} />
+                    <PodcastList onPodcastChange={handlePlayerTypeChange} />
                 ) : null}
 
                 {playerType === 'fragment' ? (
                     <EpisodeFragment
-                        onEpisodeFragmentChange={handlePlayerChange}
+                        onEpisodeFragmentChange={handlePlayerTypeChange}
                     />
                 ) : null}
 
                 {playerType === 'playlist' ? (
-                    <Playlist onPlaylistChange={handlePlayerChange} />
+                    <Playlist onPlaylistChange={handlePlayerTypeChange} />
                 ) : null}
 
                 <div>
