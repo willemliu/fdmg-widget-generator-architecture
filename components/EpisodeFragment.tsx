@@ -4,11 +4,14 @@ import { ChangeEvent, useEffect, useState, useRef } from 'react';
 interface Props {
     onEpisodeFragmentChange: (url: string) => void;
     onEpisodeCount: (episodeCount: number) => void;
+    onSearchChange: (searchString: string) => void;
+    searchString?: string;
 }
 
 // Should ideally be loaded from environment variables.
 // For this example it's simply hard-coded.
-const searchUrl = 'https://dev.bnr.nl/widget-search?q=';
+const baseUrl = process.env.BASE_URL;
+const searchUrl = process.env.SEARCH_URL;
 
 let debounceTimeout: NodeJS.Timeout;
 
@@ -119,8 +122,9 @@ export function EpisodeFragment(props: Props) {
 
     // Same as componentDidMount
     useEffect(() => {
-        // Set initial URL
-        props.onEpisodeFragmentChange('');
+        if (props.searchString) {
+            search(props.searchString);
+        }
     }, []);
 
     /**
@@ -133,9 +137,9 @@ export function EpisodeFragment(props: Props) {
         if (itemToBeSet) {
             setFragment(itemToBeSet);
             props.onEpisodeFragmentChange(
-                `https://dev.bnr.nl/podcast/json/${itemToBeSet.id}`
+                `${baseUrl}/podcast/json/${itemToBeSet.id}`
             );
-            fetch(`https://dev.bnr.nl/podcast/json/${itemToBeSet.id}`, {
+            fetch(`${baseUrl}/podcast/json/${itemToBeSet.id}`, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -144,6 +148,8 @@ export function EpisodeFragment(props: Props) {
                 .then((json: Episode) => {
                     props.onEpisodeCount(json.episodes.length);
                 });
+        } else {
+            props.onEpisodeFragmentChange('');
         }
     }
 
@@ -153,20 +159,25 @@ export function EpisodeFragment(props: Props) {
         }
         const value = event.currentTarget.value;
         debounceTimeout = setTimeout(() => {
-            fetch(`${searchUrl}${value}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then((res) => res.json())
-                .then((json: Fragment[]) => {
-                    const onlyAudioItems = json.filter(
-                        (fragment) => fragment.audio
-                    );
-
-                    setSearchResults(onlyAudioItems);
-                });
+            props.onSearchChange(value);
+            search(value);
         }, 300);
+    }
+
+    function search(value) {
+        fetch(`${searchUrl}${value}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((res) => res.json())
+            .then((json: Fragment[]) => {
+                const onlyAudioItems = json.filter(
+                    (fragment) => fragment.audio
+                );
+
+                setSearchResults(onlyAudioItems);
+            });
     }
 
     return (
@@ -176,6 +187,7 @@ export function EpisodeFragment(props: Props) {
                 name="q"
                 placeholder="Search episode/fragment"
                 onChange={onChange}
+                defaultValue={props.searchString}
             />
 
             {searchResults.length ? (

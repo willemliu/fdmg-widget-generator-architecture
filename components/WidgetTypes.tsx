@@ -7,7 +7,7 @@ interface Props {
     onChange: (playerType: PlayerType) => void;
 }
 
-export function WidgetTypes(props: Props) {
+export function PlayerTypes(props: Props) {
     function handleOnChange(event: ChangeEvent<HTMLInputElement>) {
         switch (event.currentTarget.value) {
             case 'fragment':
@@ -27,7 +27,7 @@ export function WidgetTypes(props: Props) {
             <label>
                 <input
                     type="radio"
-                    name="widgetType"
+                    name="playerType"
                     value="podcast"
                     checked={props.defaultValue === 'podcast'}
                     onChange={handleOnChange}
@@ -37,7 +37,7 @@ export function WidgetTypes(props: Props) {
             <label>
                 <input
                     type="radio"
-                    name="widgetType"
+                    name="playerType"
                     value="fragment"
                     checked={props.defaultValue === 'fragment'}
                     onChange={handleOnChange}
@@ -47,7 +47,7 @@ export function WidgetTypes(props: Props) {
             <label>
                 <input
                     type="radio"
-                    name="widgetType"
+                    name="playerType"
                     value="playlist"
                     checked={props.defaultValue === 'playlist'}
                     onChange={handleOnChange}

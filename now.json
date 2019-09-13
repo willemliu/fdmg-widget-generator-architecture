@@ -1,0 +1,15 @@
+{
+    "regions": ["dub1"],
+    "env": {
+        "BASE_URL": "@fdmg-widget-generator-base-url",
+        "SEARCH_URL": "@fdmg-widget-generator-search-url",
+        "WIDGET_URL": "@fdmg-widget-generator-widget-url"
+    },
+    "build": {
+        "env": {
+            "BASE_URL": "@fdmg-widget-generator-base-url",
+            "SEARCH_URL": "@fdmg-widget-generator-search-url",
+            "WIDGET_URL": "@fdmg-widget-generator-widget-url"
+        }
+    }
+}

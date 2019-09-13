@@ -7,12 +7,12 @@ import {
 } from 'react-beautiful-dnd';
 import { Fragment } from './EpisodeFragment';
 
-// Should ideally be loaded from environment variables.
-// For this example it's simply hard-coded.
-const searchUrl = 'https://dev.bnr.nl/widget-search?q=';
+const searchUrl = process.env.SEARCH_URL;
 
 interface Props {
     onPlaylistChange: (playlist: Fragment[]) => void;
+    onSearchChange: (searchString: string) => void;
+    searchString?: string;
 }
 let debounceTimeout: NodeJS.Timeout;
 
@@ -21,12 +21,33 @@ export function Playlist(props: Props) {
     const [playlist, setPlaylist] = useState([]);
     const itemListRef = useRef(null);
 
+    useEffect(() => {
+        if (props.searchString) {
+            search(props.searchString);
+        }
+    }, []);
+
     /**
      * Let parent component know the playlist changed.
      */
     useEffect(() => {
         props.onPlaylistChange(playlist);
     }, [playlist]);
+
+    function search(query: string) {
+        fetch(`${searchUrl}${query}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((res) => res.json())
+            .then((json: Fragment[]) => {
+                const onlyAudioItems = json.filter(
+                    (fragment) => fragment.audio
+                );
+                setItemList(onlyAudioItems);
+            });
+    }
 
     /**
      * Handle search input changes.
@@ -39,18 +60,8 @@ export function Playlist(props: Props) {
         const value = event.currentTarget.value;
 
         debounceTimeout = setTimeout(() => {
-            fetch(`${searchUrl}${value}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then((res) => res.json())
-                .then((json: Fragment[]) => {
-                    const onlyAudioItems = json.filter(
-                        (fragment) => fragment.audio
-                    );
-                    setItemList(onlyAudioItems);
-                });
+            props.onSearchChange(value);
+            search(value);
         }, 300);
     }
 
@@ -103,6 +114,7 @@ export function Playlist(props: Props) {
                 name="q"
                 placeholder="Search episode/fragment for playlist"
                 onChange={onSearchChange}
+                defaultValue={props.searchString}
             />
             {itemList.length ? (
                 <select ref={itemListRef}>

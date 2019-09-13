@@ -1,4 +1,4 @@
-import { WidgetTypes, PlayerType } from '../components/WidgetTypes';
+import { PlayerTypes, PlayerType } from '../components/WidgetTypes';
 import { useState, useEffect } from 'react';
 import { PodcastList } from '../components/PodcastList';
 import { SponsorCheckbox } from '../components/SponsorCheckbox';
@@ -7,9 +7,8 @@ import { EpisodeFragment, Fragment } from '../components/EpisodeFragment';
 import { Playlist } from '../components/Playlist';
 import { ThemeName, getThemeColors } from '../utils/themes';
 
-// Should ideally be loaded from environment variables.
-// For this example it's simply hard-coded.
-const baseUrl = 'https://static-dev.bnr.nl/audio-widget-v2/index.html';
+const baseUrl = process.env.BASE_URL;
+const widgetUrl = process.env.WIDGET_URL;
 
 export default function Index() {
     const [playerType, setPlayerType] = useState<PlayerType>('podcast');
@@ -21,6 +20,11 @@ export default function Index() {
     const [sponsorCount, setSponsorCount] = useState(0);
     const [episodeCount, setEpisodeCount] = useState(0);
     const [showIframe, setShowIframe] = useState(false);
+    const [playlistSearchString, setPlaylistSearchString] = useState(null);
+    const [episodeSearchString, setEpisodeSearchString] = useState(null);
+    const [showFragmentIframe, setShowFragmentIframe] = useState(false);
+    const [showPodcastIframe, setShowPodcastIframe] = useState(false);
+    const [showPlaylistIframe, setShowPlaylistIframe] = useState(false);
 
     /**
      * Helper method to join the ids of the items in the playlist as a comma-separated
@@ -32,29 +36,24 @@ export default function Index() {
         return uri;
     }
 
-    /**
-     * Gets called on changes within the player types themselves and then sets the
-     * base-player-url accordingly. The global URI parameters e.g. `showSponsor` and `colors`
-     * appender at another stage.
-     */
-    function handlePlayerTypeChange(urlOrPlaylist: string | Fragment[]) {
-        switch (playerType) {
-            case 'podcast':
-            case 'fragment':
-                setPlayerUrl(`${baseUrl}?podcast=${urlOrPlaylist}`);
-                break;
-            case 'playlist':
-                // Process the playlist
-                if (typeof urlOrPlaylist === 'object') {
-                    setEpisodeCount(urlOrPlaylist.length);
-                    setPlayerUrl(
-                        `${baseUrl}?playlistItemsUrl=https://dev.bnr.nl/podcast/json/ids&items=${getUriFromPlaylist(
-                            urlOrPlaylist
-                        )}`
-                    );
-                }
-                break;
-        }
+    function handlePlaylistChange(playlist: Fragment[]) {
+        setEpisodeCount(playlist.length);
+        setShowPlaylistIframe(playlist.length > 0);
+        setPlayerUrl(
+            `${widgetUrl}?playlistItemsUrl=${baseUrl}/podcast/json/ids&items=${getUriFromPlaylist(
+                playlist
+            )}`
+        );
+    }
+
+    function handlePodcastChange(url: string) {
+        setShowPodcastIframe(!!url);
+        setPlayerUrl(`${widgetUrl}?podcast=${url}`);
+    }
+
+    function handleFragmentChange(url: string) {
+        setShowFragmentIframe(!!url);
+        setPlayerUrl(`${widgetUrl}?podcast=${url}`);
     }
 
     /**
@@ -115,12 +114,17 @@ export default function Index() {
         );
         setPlayerModel(playerModel);
 
-        /**
-         * Render the iframe when not a playlist with zero items.
-         */
-        setShowIframe(
-            (playerType === 'playlist' && episodeCount === 0) === false
-        );
+        switch (playerType) {
+            case 'fragment':
+                setShowIframe(showFragmentIframe);
+                break;
+            case 'playlist':
+                setShowIframe(showPlaylistIframe);
+                break;
+            case 'podcast':
+                setShowIframe(showPodcastIframe);
+                break;
+        }
 
         setEmbedCode(
             `<iframe height="${getPlayerHeight(
@@ -135,26 +139,32 @@ export default function Index() {
         <section>
             <main>
                 <h1>FDMG Widget Generator architecture</h1>
-                <WidgetTypes
+                <PlayerTypes
                     defaultValue={playerType}
                     onChange={setPlayerType}
                 />
                 {playerType === 'podcast' ? (
                     <PodcastList
-                        onPodcastChange={handlePlayerTypeChange}
+                        onPodcastChange={handlePodcastChange}
                         onSponsorLength={setSponsorCount}
                     />
                 ) : null}
 
                 {playerType === 'fragment' ? (
                     <EpisodeFragment
-                        onEpisodeFragmentChange={handlePlayerTypeChange}
+                        onSearchChange={setEpisodeSearchString}
+                        onEpisodeFragmentChange={handleFragmentChange}
                         onEpisodeCount={setEpisodeCount}
+                        searchString={episodeSearchString}
                     />
                 ) : null}
 
                 {playerType === 'playlist' ? (
-                    <Playlist onPlaylistChange={handlePlayerTypeChange} />
+                    <Playlist
+                        onSearchChange={setPlaylistSearchString}
+                        searchString={playlistSearchString}
+                        onPlaylistChange={handlePlaylistChange}
+                    />
                 ) : null}
 
                 <div>

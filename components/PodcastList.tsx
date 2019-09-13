@@ -15,7 +15,7 @@ export interface PodcastType {
 
 // Should ideally be loaded from environment variables.
 // For this example it's simply hard-coded.
-const baseUrl = 'https://dev.bnr.nl';
+const baseUrl = process.env.BASE_URL;
 
 interface Props {
     onPodcastChange: (url: string) => void;
@@ -26,7 +26,7 @@ export function PodcastList(props: Props) {
     const [podcasts, setPodcasts] = useState<PodcastType[]>([]);
     // Same as componentDidMount
     useEffect(() => {
-        fetch(`https://dev.bnr.nl/widget-podcasts`, {
+        fetch(`${baseUrl}/widget-podcasts`, {
             headers: {
                 'Content-Type': 'application/json',
             },
