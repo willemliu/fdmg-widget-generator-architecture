@@ -1,5 +1,6 @@
 import 'fetch-everywhere';
 import { ChangeEvent, useEffect, useState, useRef } from 'react';
+import { debounce } from '../utils/debounce';
 
 interface Props {
     onEpisodeFragmentChange: (url: string) => void;
@@ -12,8 +13,6 @@ interface Props {
 // For this example it's simply hard-coded.
 const baseUrl = process.env.BASE_URL;
 const searchUrl = process.env.SEARCH_URL;
-
-let debounceTimeout: NodeJS.Timeout;
 
 export interface Episode {
     title: string;
@@ -147,6 +146,9 @@ export function EpisodeFragment(props: Props) {
                 .then((res) => res.json())
                 .then((json: Episode) => {
                     props.onEpisodeCount(json.episodes.length);
+                })
+                .catch((e) => {
+                    console.error(e);
                 });
         } else {
             props.onEpisodeFragmentChange('');
@@ -154,14 +156,11 @@ export function EpisodeFragment(props: Props) {
     }
 
     function onChange(event: ChangeEvent<HTMLInputElement>) {
-        if (debounceTimeout) {
-            clearTimeout(debounceTimeout);
-        }
         const value = event.currentTarget.value;
-        debounceTimeout = setTimeout(() => {
+        debounce(() => {
             props.onSearchChange(value);
             search(value);
-        }, 300);
+        });
     }
 
     function search(value) {
@@ -177,6 +176,9 @@ export function EpisodeFragment(props: Props) {
                 );
 
                 setSearchResults(onlyAudioItems);
+            })
+            .catch((e) => {
+                console.error(e);
             });
     }
 

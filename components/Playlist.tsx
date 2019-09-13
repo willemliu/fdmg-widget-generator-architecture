@@ -6,6 +6,7 @@ import {
     DropResult,
 } from 'react-beautiful-dnd';
 import { Fragment } from './EpisodeFragment';
+import { debounce } from '../utils/debounce';
 
 const searchUrl = process.env.SEARCH_URL;
 
@@ -14,7 +15,6 @@ interface Props {
     onSearchChange: (searchString: string) => void;
     searchString?: string;
 }
-let debounceTimeout: NodeJS.Timeout;
 
 export function Playlist(props: Props) {
     const [itemList, setItemList] = useState<Fragment[]>([]);
@@ -46,6 +46,9 @@ export function Playlist(props: Props) {
                     (fragment) => fragment.audio
                 );
                 setItemList(onlyAudioItems);
+            })
+            .catch((e) => {
+                console.error(e);
             });
     }
 
@@ -54,15 +57,11 @@ export function Playlist(props: Props) {
      * @param event
      */
     function onSearchChange(event: ChangeEvent<HTMLInputElement>) {
-        if (debounceTimeout) {
-            clearTimeout(debounceTimeout);
-        }
         const value = event.currentTarget.value;
-
-        debounceTimeout = setTimeout(() => {
+        debounce(() => {
             props.onSearchChange(value);
             search(value);
-        }, 300);
+        });
     }
 
     // a little function to help us with reordering the result
