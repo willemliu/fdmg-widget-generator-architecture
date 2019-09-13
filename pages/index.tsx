@@ -17,6 +17,7 @@ export default function Index() {
     const [embedCode, setEmbedCode] = useState('');
     const [sponsorCount, setSponsorCount] = useState(0);
     const [episodeCount, setEpisodeCount] = useState(0);
+    const [showIframe, setShowIframe] = useState(false);
 
     /**
      * Helper method to join the ids of the items in the playlist as a comma-separated
@@ -110,6 +111,14 @@ export default function Index() {
             2
         );
         setPlayerModel(playerModel);
+
+        /**
+         * Render the iframe when not a playlist with zero items.
+         */
+        setShowIframe(
+            (playerType === 'playlist' && episodeCount === 0) === false
+        );
+
         setEmbedCode(
             `<iframe height="${getPlayerHeight(
                 playerType
@@ -176,7 +185,9 @@ export default function Index() {
                         onFocus={(e) => e.currentTarget.select()}
                     />
                 </label>
-                <div dangerouslySetInnerHTML={{ __html: embedCode }} />
+                {showIframe ? (
+                    <div dangerouslySetInnerHTML={{ __html: embedCode }} />
+                ) : null}
             </aside>
 
             <style jsx global>{`
