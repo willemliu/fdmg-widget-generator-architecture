@@ -6,6 +6,10 @@ interface Props {
     onEpisodeCount: (episodeCount: number) => void;
 }
 
+// Should ideally be loaded from environment variables.
+// For this example it's simply hard-coded.
+const searchUrl = 'https://dev.bnr.nl/widget-search?q=';
+
 let debounceTimeout: NodeJS.Timeout;
 
 export interface Episode {
@@ -146,7 +150,7 @@ export function EpisodeFragment(props: Props) {
         }
         const value = event.currentTarget.value;
         debounceTimeout = setTimeout(() => {
-            fetch(`https://dev.bnr.nl/widget-search?q=${value}`, {
+            fetch(`${searchUrl}${value}`, {
                 headers: {
                     'Content-Type': 'application/json',
                 },

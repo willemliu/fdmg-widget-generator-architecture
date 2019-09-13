@@ -1,5 +1,21 @@
 import { useEffect, useState, ChangeEvent } from 'react';
-import { PODCASTS, PodcastType } from '../mocks/podcasts';
+
+export interface PodcastType {
+    title: string;
+    intro: string;
+    websiteUrl: string;
+    artworkUrl: string;
+    brandedPodcast: boolean;
+    programType: string;
+    programTitle: string;
+    programUrl: string;
+    sponsors: any[];
+    episodes: any[];
+}
+
+// Should ideally be loaded from environment variables.
+// For this example it's simply hard-coded.
+const baseUrl = 'https://dev.bnr.nl';
 
 interface Props {
     onPodcastChange: (url: string) => void;
@@ -10,18 +26,23 @@ export function PodcastList(props: Props) {
     const [podcasts, setPodcasts] = useState<PodcastType[]>([]);
     // Same as componentDidMount
     useEffect(() => {
-        // Do your fetch data here. We mock this for now.
-        setPodcasts(PODCASTS);
-        // Set initial URL
-        props.onPodcastChange(
-            `https://dev.bnr.nl${PODCASTS[0].programUrl}/json`
-        );
-        props.onSponsorLength(PODCASTS[0].sponsors.length);
+        fetch(`https://dev.bnr.nl/widget-podcasts`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((res) => res.json())
+            .then((json: PodcastType[]) => {
+                setPodcasts(json);
+                // Set initial URL
+                props.onPodcastChange(`${baseUrl}${json[0].programUrl}/json`);
+                props.onSponsorLength(json[0].sponsors.length);
+            });
     }, []);
 
     function handlePodcastChange(event: ChangeEvent<HTMLSelectElement>) {
         const programUrl = event.currentTarget.value;
-        props.onPodcastChange(`https://dev.bnr.nl${programUrl}/json`);
+        props.onPodcastChange(`${baseUrl}${programUrl}/json`);
         const podcast = podcasts.filter(
             (podcast) => podcast.programUrl === programUrl
         );

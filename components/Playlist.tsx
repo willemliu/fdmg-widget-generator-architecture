@@ -7,6 +7,10 @@ import {
 } from 'react-beautiful-dnd';
 import { Fragment } from './EpisodeFragment';
 
+// Should ideally be loaded from environment variables.
+// For this example it's simply hard-coded.
+const searchUrl = 'https://dev.bnr.nl/widget-search?q=';
+
 interface Props {
     onPlaylistChange: (playlist: Fragment[]) => void;
 }
@@ -35,7 +39,7 @@ export function Playlist(props: Props) {
         const value = event.currentTarget.value;
 
         debounceTimeout = setTimeout(() => {
-            fetch(`https://dev.bnr.nl/widget-search?q=${value}`, {
+            fetch(`${searchUrl}${value}`, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
