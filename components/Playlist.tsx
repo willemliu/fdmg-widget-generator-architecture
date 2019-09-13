@@ -1,23 +1,19 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, ChangeEvent } from 'react';
 import {
     DragDropContext,
     Droppable,
     Draggable,
     DropResult,
 } from 'react-beautiful-dnd';
-import { ITEM_LIST } from '../mocks/itemList';
-
-export type PlaylistItem = {
-    programTitle: string;
-    programUrl: string;
-};
+import { Fragment } from './EpisodeFragment';
 
 interface Props {
-    onPlaylistChange: (playlist: PlaylistItem[]) => void;
+    onPlaylistChange: (playlist: Fragment[]) => void;
 }
+let debounceTimeout: NodeJS.Timeout;
 
 export function Playlist(props: Props) {
-    const [itemList, setItemList] = useState<PlaylistItem[]>([]);
+    const [itemList, setItemList] = useState<Fragment[]>([]);
     const [playlist, setPlaylist] = useState([]);
     const itemListRef = useRef(null);
 
@@ -28,17 +24,30 @@ export function Playlist(props: Props) {
         props.onPlaylistChange(playlist);
     }, [playlist]);
 
-    function onSearchChange() {
-        // Fetch search query and load results
-        setItemList(ITEM_LIST);
+    function onSearchChange(event: ChangeEvent<HTMLInputElement>) {
+        if (debounceTimeout) {
+            clearTimeout(debounceTimeout);
+        }
+        const value = event.currentTarget.value;
+
+        debounceTimeout = setTimeout(() => {
+            fetch(`https://dev.bnr.nl/widget-search?q=${value}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then((res) => res.json())
+                .then((json: Fragment[]) => {
+                    const onlyAudioItems = json.filter(
+                        (fragment) => fragment.audio
+                    );
+                    setItemList(onlyAudioItems);
+                });
+        }, 300);
     }
 
     // a little function to help us with reordering the result
-    function reorder(
-        list: PlaylistItem[],
-        startIndex: number,
-        endIndex: number
-    ) {
+    function reorder(list: Fragment[], startIndex: number, endIndex: number) {
         const result = Array.from(list);
         const [removed] = result.splice(startIndex, 1);
         result.splice(endIndex, 0, removed);
@@ -64,7 +73,7 @@ export function Playlist(props: Props) {
     function addItem() {
         // Add the item to the list.
         const itemToBeAdded = itemList.find(
-            (item) => item.programUrl === itemListRef.current.value
+            (item) => item.id === parseInt(itemListRef.current.value)
         );
         // Check for duplicates; prevent if duplicate
         if (playlist.indexOf(itemToBeAdded) > -1) {
@@ -84,8 +93,8 @@ export function Playlist(props: Props) {
             {itemList.length ? (
                 <select ref={itemListRef}>
                     {itemList.map((item) => (
-                        <option key={item.programUrl} value={item.programUrl}>
-                            {item.programTitle}
+                        <option key={item.id} value={item.id}>
+                            {item.title}
                         </option>
                     ))}
                 </select>
@@ -106,18 +115,18 @@ export function Playlist(props: Props) {
                                 >
                                     {playlist.map((item, index) => (
                                         <Draggable
-                                            key={item.programUrl}
-                                            draggableId={item.programUrl}
+                                            key={item.id}
+                                            draggableId={item.id}
                                             index={index}
                                         >
                                             {(provided) => (
                                                 <li
-                                                    data-value={item.programUrl}
+                                                    data-value={item.id}
                                                     ref={provided.innerRef}
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    {item.programTitle}
+                                                    {item.title}
                                                 </li>
                                             )}
                                         </Draggable>

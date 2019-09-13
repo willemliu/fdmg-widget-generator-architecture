@@ -7,7 +7,7 @@ interface Props {
 
 let debounceTimeout: NodeJS.Timeout;
 
-interface Fragment {
+export interface Fragment {
     id: number;
     title: string;
     intro: string;

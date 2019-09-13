@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { PodcastList } from '../components/PodcastList';
 import { SponsorCheckbox } from '../components/SponsorCheckbox';
 import { Themes } from '../components/Themes';
-import { EpisodeFragment } from '../components/EpisodeFragment';
-import { Playlist, PlaylistItem } from '../components/Playlist';
+import { EpisodeFragment, Fragment } from '../components/EpisodeFragment';
+import { Playlist } from '../components/Playlist';
 
 const baseUrl = 'https://static-dev.bnr.nl/audio-widget-v2/index.html';
 export default function Index() {
@@ -19,12 +19,12 @@ export default function Index() {
         setPlayerType(playerType);
     }
 
-    function getUriFromPlaylist(playlist: PlaylistItem[]) {
-        const uri = playlist.map((item) => item.programUrl).join();
+    function getUriFromPlaylist(playlist: Fragment[]) {
+        const uri = playlist.map((item) => item.id).join();
         return encodeURIComponent(uri);
     }
 
-    function handlePlayerChange(urlOrPlaylist: string | PlaylistItem[]) {
+    function handlePlayerChange(urlOrPlaylist: string | Fragment[]) {
         switch (playerType) {
             case 'podcast':
             case 'fragment':
