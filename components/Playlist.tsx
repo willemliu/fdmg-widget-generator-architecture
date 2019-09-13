@@ -21,6 +21,9 @@ export function Playlist(props: Props) {
     const [playlist, setPlaylist] = useState([]);
     const itemListRef = useRef(null);
 
+    /**
+     * Let parent component know the playlist changed.
+     */
     useEffect(() => {
         props.onPlaylistChange(playlist);
     }, [playlist]);
@@ -119,6 +122,7 @@ export function Playlist(props: Props) {
                                             )}
                                         </Draggable>
                                     ))}
+                                    {provided.placeholder}
                                 </ol>
                             )}
                         </Droppable>

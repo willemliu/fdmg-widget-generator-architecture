@@ -6,6 +6,7 @@ import { Themes } from '../components/Themes';
 import { EpisodeFragment } from '../components/EpisodeFragment';
 import { Playlist, PlaylistItem } from '../components/Playlist';
 
+const baseUrl = 'https://static-dev.bnr.nl/audio-widget-v2/index.html';
 export default function Index() {
     const [playerType, setPlayerType] = useState<PlayerType>('podcast');
     const [playerUrl, setPlayerUrl] = useState('');
@@ -25,25 +26,22 @@ export default function Index() {
 
     function handlePlayerChange(urlOrPlaylist: string | PlaylistItem[]) {
         switch (playerType) {
+            case 'podcast':
             case 'fragment':
                 setPlayerUrl(
-                    `https://some.url.to.the.player?fragment=${urlOrPlaylist}&theme=${theme}`
+                    `${baseUrl}?podcast=${urlOrPlaylist}&colors=${theme}`
                 );
                 break;
             case 'playlist':
                 // Process the playlist
                 if (typeof urlOrPlaylist === 'object') {
                     setPlayerUrl(
-                        `https://some.url.to.the.player?playlist=${getUriFromPlaylist(
+                        `${baseUrl}?playlistItemsUrl=https://dev.bnr.nl/podcast/json/ids&items=${getUriFromPlaylist(
                             urlOrPlaylist
-                        )}&theme=${theme}`
+                        )}&colors=${theme}`
                     );
                 }
                 break;
-            case 'podcast':
-                setPlayerUrl(
-                    `https://some.url.to.the.player?podcast=${urlOrPlaylist}&theme=${theme}`
-                );
         }
     }
 
@@ -86,7 +84,7 @@ export default function Index() {
         );
         setPlayerModel(playerModel);
         setEmbedCode(
-            `<iframe src="${playerUrl}"
+            `<iframe src="${playerUrl}&showSponsor=${hasSponsor}"
     data-sponsor="${hasSponsor}"
     data-player-type="${playerType}"
     data-theme="${theme}"

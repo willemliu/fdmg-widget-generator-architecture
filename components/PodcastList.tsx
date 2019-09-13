@@ -12,11 +12,15 @@ export function PodcastList(props: Props) {
         // Do your fetch data here. We mock this for now.
         setPodcasts(PODCASTS);
         // Set initial URL
-        props.onPodcastChange(PODCASTS[0].programUrl);
+        props.onPodcastChange(
+            `https://dev.bnr.nl${PODCASTS[0].programUrl}/json`
+        );
     }, []);
 
     function handlePodcastChange(event: ChangeEvent<HTMLSelectElement>) {
-        props.onPodcastChange(event.currentTarget.value);
+        props.onPodcastChange(
+            `https://dev.bnr.nl${event.currentTarget.value}/json`
+        );
     }
 
     return (
