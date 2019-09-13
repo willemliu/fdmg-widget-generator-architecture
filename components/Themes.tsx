@@ -1,29 +1,32 @@
 import { ChangeEvent, useEffect } from 'react';
+import { ThemeName } from '../utils/themes';
 
 interface Props {
-    onChange: (theme: string) => void;
+    onChange: (theme: ThemeName) => void;
 }
 
 export function Themes(props: Props) {
     // Same as componentDidMount
     useEffect(() => {
-        props.onChange('bnr');
+        props.onChange(ThemeName.BNR);
     }, []);
 
     function onChange(event: ChangeEvent<HTMLSelectElement>) {
-        props.onChange(event.currentTarget.value);
+        props.onChange(ThemeName[event.currentTarget.value]);
     }
 
     return (
         <div>
             <select onChange={onChange}>
-                <option value="bnr">BNR</option>
-                <option value="energeia">Energeia</option>
-                <option value="esb">ESB</option>
-                <option value="fd">Fd</option>
-                <option value="fd-persoonlijk">Fd Persoonlijk</option>
-                <option value="pensioen-pro">PensioenPro</option>
-                <option value="custom">- Create your own color-scheme -</option>
+                <option value={ThemeName.BNR}>BNR</option>
+                <option value={ThemeName.ENERGEIA}>Energeia</option>
+                <option value={ThemeName.ESB}>ESB</option>
+                <option value={ThemeName.FD}>Fd</option>
+                <option value={ThemeName.FD_PERSOONLIJK}>Fd Persoonlijk</option>
+                <option value={ThemeName.PENSIOEN_PRO}>PensioenPro</option>
+                <option value={ThemeName.CUSTOM}>
+                    - Create your own color-scheme -
+                </option>
             </select>
         </div>
     );

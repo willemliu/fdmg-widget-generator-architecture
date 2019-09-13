@@ -5,6 +5,7 @@ import { SponsorCheckbox } from '../components/SponsorCheckbox';
 import { Themes } from '../components/Themes';
 import { EpisodeFragment, Fragment } from '../components/EpisodeFragment';
 import { Playlist } from '../components/Playlist';
+import { ThemeName, getThemeColors } from '../utils/themes';
 
 const baseUrl = 'https://static-dev.bnr.nl/audio-widget-v2/index.html';
 export default function Index() {
@@ -12,7 +13,7 @@ export default function Index() {
     const [playerUrl, setPlayerUrl] = useState('');
     const [hasSponsor, setHasSponsor] = useState(true);
     const [playerModel, setPlayerModel] = useState('');
-    const [theme, setTheme] = useState('bnr');
+    const [theme, setTheme] = useState(ThemeName.BNR);
     const [embedCode, setEmbedCode] = useState('');
 
     function handleWidgetTypeChanged(playerType: PlayerType) {
@@ -28,9 +29,7 @@ export default function Index() {
         switch (playerType) {
             case 'podcast':
             case 'fragment':
-                setPlayerUrl(
-                    `${baseUrl}?podcast=${urlOrPlaylist}&colors=${theme}`
-                );
+                setPlayerUrl(`${baseUrl}?podcast=${urlOrPlaylist}`);
                 break;
             case 'playlist':
                 // Process the playlist
@@ -38,7 +37,7 @@ export default function Index() {
                     setPlayerUrl(
                         `${baseUrl}?playlistItemsUrl=https://dev.bnr.nl/podcast/json/ids&items=${getUriFromPlaylist(
                             urlOrPlaylist
-                        )}&colors=${theme}`
+                        )}`
                     );
                 }
                 break;
@@ -49,7 +48,7 @@ export default function Index() {
         setHasSponsor(hasSponsor);
     }
 
-    function handleThemeChange(theme: string) {
+    function handleThemeChange(theme: ThemeName) {
         // Process your theme colors here and change your layout accordingly
         setTheme(theme);
     }
@@ -84,12 +83,9 @@ export default function Index() {
         );
         setPlayerModel(playerModel);
         setEmbedCode(
-            `<iframe src="${playerUrl}&showSponsor=${hasSponsor}"
-    data-sponsor="${hasSponsor}"
-    data-player-type="${playerType}"
-    data-theme="${theme}"
-    height="${getPlayerHeight(playerType)}"
-/>`
+            `<iframe src="${playerUrl}&showSponsor=${hasSponsor}&colors=${getThemeColors(
+                theme
+            )}" frameBorder="0"/>`
         );
     }, [playerType, playerUrl, hasSponsor, theme]);
 
@@ -146,6 +142,7 @@ export default function Index() {
                         onFocus={(e) => e.currentTarget.select()}
                     />
                 </label>
+                <div dangerouslySetInnerHTML={{ __html: embedCode }} />
             </aside>
 
             <style jsx global>{`
