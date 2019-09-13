@@ -128,7 +128,11 @@ export function EpisodeFragment(props: Props) {
             props.onEpisodeFragmentChange(
                 `https://dev.bnr.nl/podcast/json/${itemToBeSet.id}`
             );
-            fetch(`https://dev.bnr.nl/podcast/json/${itemToBeSet.id}`)
+            fetch(`https://dev.bnr.nl/podcast/json/${itemToBeSet.id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
                 .then((res) => res.json())
                 .then((json: Episode) => {
                     props.onEpisodeCount(json.episodes.length);

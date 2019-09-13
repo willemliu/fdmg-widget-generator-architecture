@@ -7,7 +7,10 @@ import { EpisodeFragment, Fragment } from '../components/EpisodeFragment';
 import { Playlist } from '../components/Playlist';
 import { ThemeName, getThemeColors } from '../utils/themes';
 
+// Should ideally be loaded from environment variables.
+// For this example it's simply hard-coded.
 const baseUrl = 'https://static-dev.bnr.nl/audio-widget-v2/index.html';
+
 export default function Index() {
     const [playerType, setPlayerType] = useState<PlayerType>('podcast');
     const [playerUrl, setPlayerUrl] = useState('');
