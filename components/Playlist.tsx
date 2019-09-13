@@ -94,7 +94,6 @@ export function Playlist(props: Props) {
                 <select ref={itemListRef}>
                     {itemList.map((item) => (
                         <option key={item.id} value={item.id}>
-                            <img src={item.picture.imageUrlSmall} />
                             {item.title}
                         </option>
                     ))}
