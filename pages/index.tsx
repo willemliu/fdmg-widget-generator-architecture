@@ -20,11 +20,21 @@ export default function Index() {
         setPlayerType(playerType);
     }
 
+    /**
+     * Helper method to join the ids of the items in the playlist as a comma-separated
+     * string and encode it for use in a URL.
+     * @param playlist
+     */
     function getUriFromPlaylist(playlist: Fragment[]) {
         const uri = playlist.map((item) => item.id).join();
         return encodeURIComponent(uri);
     }
 
+    /**
+     * Gets called on changes within the player types themselves and then sets the
+     * base-player-url accordingly. The global URI parameters e.g. `showSponsor` and `colors`
+     * appender at another stage.
+     */
     function handlePlayerTypeChange(urlOrPlaylist: string | Fragment[]) {
         switch (playerType) {
             case 'podcast':
@@ -44,18 +54,14 @@ export default function Index() {
         }
     }
 
-    function handleSponsorChange(hasSponsor: boolean) {
-        setHasSponsor(hasSponsor);
-    }
-
-    function handleThemeChange(theme: ThemeName) {
-        // Process your theme colors here and change your layout accordingly
-        setTheme(theme);
-    }
-
-    function getPlayerHeight(widgetType: PlayerType) {
+    /**
+     * Mocked calculation of the height of the iframe player
+     *
+     * @param playerType
+     */
+    function getPlayerHeight(playerType: PlayerType) {
         const sponsorHeight = hasSponsor ? 3 : 0;
-        switch (widgetType) {
+        switch (playerType) {
             case 'fragment':
                 return 10 + sponsorHeight;
             case 'playlist':
@@ -83,7 +89,9 @@ export default function Index() {
         );
         setPlayerModel(playerModel);
         setEmbedCode(
-            `<iframe src="${playerUrl}&showSponsor=${hasSponsor}&colors=${getThemeColors(
+            `<iframe dummy-height="${getPlayerHeight(
+                playerType
+            )}" src="${playerUrl}&showSponsor=${hasSponsor}&colors=${getThemeColors(
                 theme
             )}" frameBorder="0"/>`
         );
@@ -114,11 +122,11 @@ export default function Index() {
                 <div>
                     <SponsorCheckbox
                         defaultValue={hasSponsor}
-                        onChange={handleSponsorChange}
+                        onChange={setHasSponsor}
                     />
                 </div>
                 <div>
-                    <Themes onChange={handleThemeChange} />
+                    <Themes onChange={setTheme} />
                 </div>
             </main>
             <aside>
