@@ -123,6 +123,9 @@ export function EpisodeFragment(props: Props) {
         props.onEpisodeFragmentChange('');
     }, []);
 
+    /**
+     * Set the currently selected item as the fragment.
+     */
     function setItem() {
         const itemToBeSet = searchResults.find(
             (item) => item.id === parseInt(searchResultRef.current.value, 10)

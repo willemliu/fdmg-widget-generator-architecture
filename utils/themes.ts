@@ -320,9 +320,9 @@ const themes = [
 ];
 
 export function getThemeColors(themeName: ThemeName) {
-    const theme = themes.filter((item) => item.value === themeName);
-    if (theme.length) {
-        return theme[0].colorScheme.map((color) => color.value);
+    const theme = themes.find((item) => item.value === themeName);
+    if (theme) {
+        return theme.colorScheme.map((color) => color.value);
     } else {
         themes[0].colorScheme.map((color) => color.value);
     }

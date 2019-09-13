@@ -40,13 +40,17 @@ export function PodcastList(props: Props) {
             });
     }, []);
 
+    /**
+     * When selecting a different podcast.
+     * @param event
+     */
     function handlePodcastChange(event: ChangeEvent<HTMLSelectElement>) {
         const programUrl = event.currentTarget.value;
         props.onPodcastChange(`${baseUrl}${programUrl}/json`);
-        const podcast = podcasts.filter(
+        const podcast = podcasts.find(
             (podcast) => podcast.programUrl === programUrl
         );
-        props.onSponsorLength(podcast[0].sponsors.length);
+        props.onSponsorLength(podcast.sponsors.length);
     }
 
     return (
