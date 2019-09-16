@@ -38,6 +38,7 @@ export default function Index() {
 
     function handlePlaylistChange(playlist: Fragment[]) {
         setEpisodeCount(playlist.length);
+        hideIframes();
         setShowPlaylistIframe(playlist.length > 0);
         setPlayerUrl(
             `${widgetUrl}?playlistItemsUrl=${baseUrl}/podcast/json/ids&items=${getUriFromPlaylist(
@@ -47,13 +48,21 @@ export default function Index() {
     }
 
     function handlePodcastChange(url: string) {
+        hideIframes();
         setShowPodcastIframe(!!url);
         setPlayerUrl(`${widgetUrl}?podcast=${url}`);
     }
 
     function handleFragmentChange(url: string) {
+        hideIframes();
         setShowFragmentIframe(!!url);
         setPlayerUrl(`${widgetUrl}?podcast=${url}`);
+    }
+
+    function hideIframes() {
+        setShowFragmentIframe(false);
+        setShowPlaylistIframe(false);
+        setShowPodcastIframe(false);
     }
 
     /**
@@ -94,6 +103,24 @@ export default function Index() {
     }
 
     /**
+     * Determine if iframe should be visible
+     * @param playerType
+     */
+    function setIframeVisible(playerType: PlayerType) {
+        switch (playerType) {
+            case 'fragment':
+                setShowIframe(showFragmentIframe);
+                break;
+            case 'playlist':
+                setShowIframe(showPlaylistIframe);
+                break;
+            case 'podcast':
+                setShowIframe(showPodcastIframe);
+                break;
+        }
+    }
+
+    /**
      * This useEffect listens to all the states which affects the BNR Player.
      * Generates the iFrame code and for convenience also the player data-model if
      * for any reason you'd want to have a JSON representation of the player.
@@ -112,19 +139,7 @@ export default function Index() {
             2
         );
         setPlayerModel(playerModel);
-
-        switch (playerType) {
-            case 'fragment':
-                setShowIframe(showFragmentIframe);
-                break;
-            case 'playlist':
-                setShowIframe(showPlaylistIframe);
-                break;
-            case 'podcast':
-                setShowIframe(showPodcastIframe);
-                break;
-        }
-
+        setIframeVisible(playerType);
         setEmbedCode(
             `<iframe height="${getPlayerHeight(
                 playerType
