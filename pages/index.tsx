@@ -1,4 +1,5 @@
 import 'core-js';
+import React from 'react';
 import { PlayerTypes, PlayerType } from '../components/WidgetTypes';
 import { useState, useEffect } from 'react';
 import { PodcastList } from '../components/PodcastList';
@@ -6,6 +7,8 @@ import { SponsorCheckbox } from '../components/SponsorCheckbox';
 import { Themes } from '../components/Themes';
 import { EpisodeFragment, Fragment } from '../components/EpisodeFragment';
 import { Playlist } from '../components/Playlist';
+
+declare let process: any;
 
 const baseUrl = process.env.BASE_URL;
 const widgetUrl = process.env.WIDGET_URL;
@@ -36,6 +39,12 @@ export default function Index() {
         return uri;
     }
 
+    function hideIframes() {
+        setShowFragmentIframe(false);
+        setShowPlaylistIframe(false);
+        setShowPodcastIframe(false);
+    }
+
     function handlePlaylistChange(playlist: Fragment[]) {
         setEpisodeCount(playlist.length);
         hideIframes();
@@ -57,12 +66,6 @@ export default function Index() {
         hideIframes();
         setShowFragmentIframe(!!url);
         setPlayerUrl(`${widgetUrl}?podcast=${url}`);
-    }
-
-    function hideIframes() {
-        setShowFragmentIframe(false);
-        setShowPlaylistIframe(false);
-        setShowPodcastIframe(false);
     }
 
     /**
