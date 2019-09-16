@@ -1,5 +1,5 @@
 {
-    "alias": ["fdmg-widget-generator-architecture-dev.willemliu.now.sh"],
+    "alias": ["fdmg-widget-generator-architecture-acc.willemliu.now.sh"],
     "regions": ["dub1"],
     "env": {
         "BASE_URL": "@fdmg-widget-generator-base-url",

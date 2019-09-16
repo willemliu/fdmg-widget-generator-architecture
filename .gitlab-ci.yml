@@ -1,0 +1,46 @@
+image: docker-repo.fdmg.org/fdmg/ubuntu1804-frontend:latest
+
+stages:
+    - test
+    - deploy
+
+build:
+    stage: test
+    script:
+        - npm i
+        - npm run test
+    artifacts:
+        expire_in: 1 day
+        paths:
+            - .next/
+    environment:
+        name: development
+
+deploy development:
+    stage: deploy
+    script:
+        - now -t $NOW_API_TOKEN --prod
+    environment:
+        name: development
+    only:
+        - master
+
+deploy acceptance:
+    stage: deploy
+    script:
+        - now -t $NOW_API_TOKEN --prod now.acc.json
+    environment:
+        name: acceptance
+    only:
+        - acceptance
+    when: manual
+
+deploy production:
+    stage: deploy
+    script:
+        - now -t $NOW_API_TOKEN --prod now.prod.json
+    environment:
+        name: production
+    only:
+        - production
+    when: manual
