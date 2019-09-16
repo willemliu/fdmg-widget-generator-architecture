@@ -1,3 +1,4 @@
+import 'core-js';
 import { PlayerTypes, PlayerType } from '../components/WidgetTypes';
 import { useState, useEffect } from 'react';
 import { PodcastList } from '../components/PodcastList';

@@ -5,6 +5,7 @@ import {
     getThemeColorsByName,
     getColorsFromTheme,
 } from '../utils/themes';
+import { debounce } from '../utils/debounce';
 
 interface Props {
     onChangeColors: (colors: string[]) => void;
@@ -20,21 +21,35 @@ export function Themes(props: Props) {
         props.onChangeColors(getThemeColorsByName(ThemeName.BNR));
     }, []);
 
+    /**
+     * Handle custom color change
+     * @param event
+     */
     function onChangeColor(event: ChangeEvent<HTMLInputElement>) {
         const inputEl = event.currentTarget;
-        theme.colorScheme.forEach((colorScheme) => {
-            if (colorScheme.label === inputEl.getAttribute('name')) {
-                colorScheme.value = inputEl.value;
-            }
-        });
-        props.onChangeColors(getColorsFromTheme(theme));
+        debounce(() => {
+            theme.colorScheme.forEach((colorScheme) => {
+                if (colorScheme.label === inputEl.getAttribute('name')) {
+                    colorScheme.value = inputEl.value;
+                }
+            });
+            props.onChangeColors(getColorsFromTheme(theme));
+        }, 300);
     }
 
+    /**
+     * Handle custom color toggle
+     * @param event
+     */
     function onCustom(event: ChangeEvent<HTMLInputElement>) {
         setShowCustom(event.currentTarget.checked);
     }
 
-    function onChange(event: ChangeEvent<HTMLSelectElement>) {
+    /**
+     * Handle Theme change
+     * @param event
+     */
+    function onChangeTheme(event: ChangeEvent<HTMLSelectElement>) {
         const themeName = ThemeName[event.currentTarget.value];
         setTheme(getTheme(themeName));
         props.onChangeColors(getThemeColorsByName(themeName));
@@ -42,7 +57,7 @@ export function Themes(props: Props) {
 
     return (
         <div>
-            <select onChange={onChange}>
+            <select onChange={onChangeTheme}>
                 <option value={ThemeName.BNR}>BNR</option>
                 <option value={ThemeName.ENERGEIA}>Energeia</option>
                 <option value={ThemeName.ESB}>ESB</option>
