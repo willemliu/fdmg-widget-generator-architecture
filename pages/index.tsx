@@ -5,7 +5,6 @@ import { SponsorCheckbox } from '../components/SponsorCheckbox';
 import { Themes } from '../components/Themes';
 import { EpisodeFragment, Fragment } from '../components/EpisodeFragment';
 import { Playlist } from '../components/Playlist';
-import { ThemeName, getThemeColors } from '../utils/themes';
 
 const baseUrl = process.env.BASE_URL;
 const widgetUrl = process.env.WIDGET_URL;
@@ -15,7 +14,7 @@ export default function Index() {
     const [playerUrl, setPlayerUrl] = useState('');
     const [hasSponsor, setHasSponsor] = useState(true);
     const [playerModel, setPlayerModel] = useState('');
-    const [theme, setTheme] = useState(ThemeName.BNR);
+    const [colors, setColors] = useState([]);
     const [embedCode, setEmbedCode] = useState('');
     const [sponsorCount, setSponsorCount] = useState(0);
     const [episodeCount, setEpisodeCount] = useState(0);
@@ -106,8 +105,7 @@ export default function Index() {
                 playerType,
                 hasSponsor,
                 playerUrl,
-                theme,
-                colors: getThemeColors(theme),
+                colors,
             },
             null,
             2
@@ -129,11 +127,9 @@ export default function Index() {
         setEmbedCode(
             `<iframe height="${getPlayerHeight(
                 playerType
-            )}" width="300" src="${playerUrl}&showSponsor=${hasSponsor}&colors=${getThemeColors(
-                theme
-            )}" frameBorder="0" scrolling="no"/>`
+            )}" width="300" src="${playerUrl}&showSponsor=${hasSponsor}&colors=${colors}" frameBorder="0" scrolling="no"/>`
         );
-    }, [playerType, playerUrl, hasSponsor, theme]);
+    }, [playerType, playerUrl, hasSponsor, colors]);
 
     return (
         <section>
@@ -174,7 +170,7 @@ export default function Index() {
                     />
                 </div>
                 <div>
-                    <Themes onChange={setTheme} />
+                    <Themes onChangeColors={setColors} />
                 </div>
             </main>
             <aside>

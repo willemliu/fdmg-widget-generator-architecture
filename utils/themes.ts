@@ -8,7 +8,19 @@ export enum ThemeName {
     CUSTOM = 'CUSTOM',
 }
 
-const themes = [
+export type ColorScheme = {
+    value: string;
+    label: string;
+    colorDescription: string;
+};
+
+export type Theme = {
+    value: ThemeName;
+    label: string;
+    colorScheme: ColorScheme[];
+};
+
+const themes: Theme[] = [
     {
         value: ThemeName.BNR,
         label: 'BNR',
@@ -319,11 +331,21 @@ const themes = [
     },
 ];
 
-export function getThemeColors(themeName: ThemeName) {
+export function getThemeColorsByName(themeName: ThemeName) {
     const theme = themes.find((item) => item.value === themeName);
     if (theme) {
         return theme.colorScheme.map((color) => color.value);
     } else {
         themes[0].colorScheme.map((color) => color.value);
     }
+}
+
+export function getColorsFromTheme(theme: Theme) {
+    return theme.colorScheme.map((color) => color.value);
+}
+
+export function getTheme(themeName: ThemeName) {
+    return JSON.parse(
+        JSON.stringify(themes.find((item) => item.value === themeName))
+    );
 }

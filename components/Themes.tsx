@@ -1,18 +1,43 @@
-import { ChangeEvent, useEffect } from 'react';
-import { ThemeName } from '../utils/themes';
+import { ChangeEvent, useEffect, useState } from 'react';
+import {
+    ThemeName,
+    getTheme,
+    getThemeColorsByName,
+    getColorsFromTheme,
+} from '../utils/themes';
 
 interface Props {
-    onChange: (theme: ThemeName) => void;
+    onChangeColors: (colors: string[]) => void;
 }
 
 export function Themes(props: Props) {
+    const [showCustom, setShowCustom] = useState(false);
+    const [theme, setTheme] = useState(getTheme(ThemeName.BNR));
+
     // Same as componentDidMount
     useEffect(() => {
-        props.onChange(ThemeName.BNR);
+        setTheme(getTheme(ThemeName.BNR));
+        props.onChangeColors(getThemeColorsByName(ThemeName.BNR));
     }, []);
 
+    function onChangeColor(event: ChangeEvent<HTMLInputElement>) {
+        const inputEl = event.currentTarget;
+        theme.colorScheme.forEach((colorScheme) => {
+            if (colorScheme.label === inputEl.getAttribute('name')) {
+                colorScheme.value = inputEl.value;
+            }
+        });
+        props.onChangeColors(getColorsFromTheme(theme));
+    }
+
+    function onCustom(event: ChangeEvent<HTMLInputElement>) {
+        setShowCustom(event.currentTarget.checked);
+    }
+
     function onChange(event: ChangeEvent<HTMLSelectElement>) {
-        props.onChange(ThemeName[event.currentTarget.value]);
+        const themeName = ThemeName[event.currentTarget.value];
+        setTheme(getTheme(themeName));
+        props.onChangeColors(getThemeColorsByName(themeName));
     }
 
     return (
@@ -24,10 +49,32 @@ export function Themes(props: Props) {
                 <option value={ThemeName.FD}>Fd</option>
                 <option value={ThemeName.FD_PERSOONLIJK}>Fd Persoonlijk</option>
                 <option value={ThemeName.PENSIOEN_PRO}>PensioenPro</option>
-                <option value={ThemeName.CUSTOM}>
-                    - Create your own color-scheme -
-                </option>
             </select>
+
+            <label>
+                <input type="checkbox" value="custom" onChange={onCustom} />{' '}
+                Customize theme
+            </label>
+
+            {showCustom ? (
+                <div>
+                    <h3>Custom</h3>
+                    {theme.colorScheme.map((colorScheme, idx) => {
+                        return (
+                            <label key={`${theme.label}-${colorScheme.label}`}>
+                                {idx} - {colorScheme.label}:
+                                <input
+                                    type="color"
+                                    name={colorScheme.label}
+                                    defaultValue={colorScheme.value}
+                                    onChange={onChangeColor}
+                                />
+                                <p>{colorScheme.colorDescription}</p>
+                            </label>
+                        );
+                    })}
+                </div>
+            ) : null}
         </div>
     );
 }
