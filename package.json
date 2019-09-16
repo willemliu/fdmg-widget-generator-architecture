@@ -5,6 +5,9 @@
     "main": "index.js",
     "scripts": {
         "build": "next build",
+        "deploy": "now --prod",
+        "deploy:acc": "now --prod -A now.acc.json",
+        "deploy:prod": "now --prod -A now.prod.json",
         "lint": "eslint pages/**/*",
         "test": "echo \"Error: no test specified\" && exit 1",
         "webpack-bundle-analyzer": "cross-env WEBPACK_BUNDLE_ANALYZER=true NOW_SERVERLESS=false next build"
