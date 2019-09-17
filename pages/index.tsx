@@ -7,7 +7,7 @@ import { SponsorCheckbox } from '../components/SponsorCheckbox';
 import { Themes } from '../components/Themes';
 import { EpisodeFragment, Fragment } from '../components/EpisodeFragment';
 import { Playlist } from '../components/Playlist';
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
 declare let process: any;
 
@@ -216,7 +216,9 @@ export default function Index() {
                     />
                 </label>
                 {showIframe ? (
-                    <div dangerouslySetInnerHTML={{ __html: embedCode }} />
+                    <StyledIframeContainer
+                        dangerouslySetInnerHTML={{ __html: embedCode }}
+                    />
                 ) : null}
             </aside>
         </section>
@@ -229,7 +231,6 @@ const GlobalStyle = createGlobalStyle`
     }
     section {
         display: flex;
-        min-height: 100vh;
     }
     main {
         flex: 1 1 33%;
@@ -242,7 +243,7 @@ const GlobalStyle = createGlobalStyle`
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: flex-start;
         > label {
             display: none;
         }
@@ -250,4 +251,9 @@ const GlobalStyle = createGlobalStyle`
     label {
         user-select: none;
     }
+`;
+
+const StyledIframeContainer = styled.div`
+    position: sticky;
+    top: 1rem;
 `;

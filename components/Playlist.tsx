@@ -116,36 +116,35 @@ export function Playlist(props: Props) {
     }
 
     return (
-        <div>
-            <StyledInput
-                type="search"
-                name="q"
-                placeholder="Search episode/fragment for playlist"
-                onChange={onSearchChange}
-                defaultValue={props.searchString}
-            />
-            {itemList.length ? (
-                <>
-                    <StyledSearchResultList>
-                        {itemList.map((item) => (
-                            <li
-                                onClick={addItem}
-                                data-id={item.id}
-                                key={item.id}
-                            >
-                                {item.title}
-                            </li>
-                        ))}
-                    </StyledSearchResultList>
-                </>
-            ) : null}
-            {itemList.length ? (
-                <button onClick={addItem}>Add to playlist</button>
-            ) : null}
-
+        <StyledContainer>
+            <StyledSearchContainer>
+                <StyledInput
+                    type="search"
+                    name="q"
+                    placeholder="Search episode/fragment for playlist"
+                    onChange={onSearchChange}
+                    defaultValue={props.searchString}
+                />
+                {itemList.length ? (
+                    <>
+                        <h3>Search results</h3>
+                        <StyledSearchResultList>
+                            {itemList.map((item) => (
+                                <li
+                                    onClick={addItem}
+                                    data-id={item.id}
+                                    key={item.id}
+                                >
+                                    {item.title}
+                                </li>
+                            ))}
+                        </StyledSearchResultList>
+                    </>
+                ) : null}
+            </StyledSearchContainer>
             {playlist.length ? (
-                <>
-                    <h2>Playlist</h2>
+                <StyledPlaylistContainer>
+                    <h3>Playlist</h3>
                     <DragDropContext onDragEnd={onDragEnd}>
                         <Droppable droppableId="droppable">
                             {(provided) => (
@@ -182,11 +181,17 @@ export function Playlist(props: Props) {
                             )}
                         </Droppable>
                     </DragDropContext>
-                </>
+                </StyledPlaylistContainer>
             ) : null}
-        </div>
+        </StyledContainer>
     );
 }
+const StyledContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    max-height: 100vh;
+    overflow: hidden;
+`;
 
 const StyledInput = styled.input`
     width: 300px;
@@ -194,9 +199,44 @@ const StyledInput = styled.input`
 
 const StyledSearchResultList = styled.ul`
     list-style: none;
-    max-height: 300px;
+    max-height: 50vh;
     overflow: auto;
     padding: 0;
     user-select: none;
     cursor: pointer;
+
+    li {
+        &:first-child {
+            border-top: 1px solid grey;
+        }
+        padding: 1rem 0;
+        border-bottom: 1px solid grey;
+    }
+`;
+
+const StyledSearchContainer = styled.section`
+    display: flex;
+    flex-direction: column;
+    margin-right: 1rem;
+`;
+
+const StyledPlaylistContainer = styled.section`
+    display: flex;
+    flex-direction: column;
+
+    ol {
+        list-style: none;
+        padding: 0;
+        max-height: 50vh;
+        overflow: auto;
+    }
+    li {
+        display: flex;
+        justify-content: space-between;
+        padding: 1rem 0;
+        &:first-child {
+            border-top: 1px solid grey;
+        }
+        border-bottom: 1px solid grey;
+    }
 `;
