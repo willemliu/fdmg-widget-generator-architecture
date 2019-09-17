@@ -7,6 +7,7 @@ import { SponsorCheckbox } from '../components/SponsorCheckbox';
 import { Themes } from '../components/Themes';
 import { EpisodeFragment, Fragment } from '../components/EpisodeFragment';
 import { Playlist } from '../components/Playlist';
+import { createGlobalStyle } from 'styled-components';
 
 declare let process: any;
 
@@ -152,6 +153,7 @@ export default function Index() {
 
     return (
         <section>
+            <GlobalStyle />
             <main>
                 <h1>FDMG Widget Generator architecture</h1>
                 <PlayerTypes
@@ -217,32 +219,32 @@ export default function Index() {
                     <div dangerouslySetInnerHTML={{ __html: embedCode }} />
                 ) : null}
             </aside>
-
-            <style jsx global>{`
-                body {
-                    margin: 0;
-                }
-                section {
-                    display: flex;
-                    min-height: 100vh;
-                }
-                main {
-                    flex: 1 1 33%;
-                }
-                main div {
-                    margin: 1rem 0;
-                }
-                aside {
-                    flex: 1 1 auto;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                }
-                label {
-                    user-select: none;
-                }
-            `}</style>
         </section>
     );
 }
+
+const GlobalStyle = createGlobalStyle`
+    body {
+        margin: 0;
+    }
+    section {
+        display: flex;
+        min-height: 100vh;
+    }
+    main {
+        flex: 1 1 33%;
+        div {
+            margin: 1rem 0;
+        }
+    }
+    aside {
+        flex: 1 1 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    label {
+        user-select: none;
+    }
+`;

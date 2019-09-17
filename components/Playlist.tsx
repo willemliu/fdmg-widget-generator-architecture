@@ -7,6 +7,7 @@ import {
 } from 'react-beautiful-dnd';
 import { Fragment } from './EpisodeFragment';
 import { debounce } from '../utils/debounce';
+import styled from 'styled-components';
 
 const searchUrl = process.env.SEARCH_URL;
 
@@ -108,7 +109,7 @@ export function Playlist(props: Props) {
 
     return (
         <div>
-            <input
+            <StyledInput
                 type="search"
                 name="q"
                 placeholder="Search episode/fragment for playlist"
@@ -163,12 +164,10 @@ export function Playlist(props: Props) {
                     </DragDropContext>
                 </>
             ) : null}
-
-            <style jsx>{`
-                input {
-                    width: 300px;
-                }
-            `}</style>
         </div>
     );
 }
+
+const StyledInput = styled.input`
+    width: 300px;
+`;
