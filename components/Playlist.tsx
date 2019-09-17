@@ -19,8 +19,7 @@ interface Props {
 
 export function Playlist(props: Props) {
     const [itemList, setItemList] = useState<Fragment[]>([]);
-    const [playlist, setPlaylist] = useState([]);
-    const itemListRef = useRef(null);
+    const [playlist, setPlaylist] = useState<Fragment[]>([]);
 
     useEffect(() => {
         if (props.searchString) {
@@ -95,16 +94,25 @@ export function Playlist(props: Props) {
     /**
      * Add selected item to the playlist
      */
-    function addItem() {
+    function addItem(event: React.MouseEvent<HTMLElement>) {
+        const id = parseInt(event.currentTarget.getAttribute('data-id'), 10);
         // Add the item to the list.
-        const itemToBeAdded = itemList.find(
-            (item) => item.id === parseInt(itemListRef.current.value)
-        );
+        const itemToBeAdded = itemList.find((item) => item.id === id);
         // Check for duplicates; prevent if duplicate
         if (playlist.indexOf(itemToBeAdded) > -1) {
             return;
         }
         setPlaylist([...playlist, itemToBeAdded]);
+    }
+
+    /**
+     * Remove item
+     * @param event
+     */
+    function removeItem(event: React.MouseEvent<HTMLButtonElement>) {
+        const id = parseInt(event.currentTarget.getAttribute('data-id'), 10);
+        const newPlaylist = [...playlist.filter((item) => item.id !== id)];
+        setPlaylist(newPlaylist);
     }
 
     return (
@@ -117,13 +125,19 @@ export function Playlist(props: Props) {
                 defaultValue={props.searchString}
             />
             {itemList.length ? (
-                <select ref={itemListRef}>
-                    {itemList.map((item) => (
-                        <option key={item.id} value={item.id}>
-                            {item.title}
-                        </option>
-                    ))}
-                </select>
+                <>
+                    <StyledSearchResultList>
+                        {itemList.map((item) => (
+                            <li
+                                onClick={addItem}
+                                data-id={item.id}
+                                key={item.id}
+                            >
+                                {item.title}
+                            </li>
+                        ))}
+                    </StyledSearchResultList>
+                </>
             ) : null}
             {itemList.length ? (
                 <button onClick={addItem}>Add to playlist</button>
@@ -142,7 +156,7 @@ export function Playlist(props: Props) {
                                     {playlist.map((item, index) => (
                                         <Draggable
                                             key={item.id}
-                                            draggableId={item.id}
+                                            draggableId={`${item.id}`}
                                             index={index}
                                         >
                                             {(provided) => (
@@ -152,7 +166,13 @@ export function Playlist(props: Props) {
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
                                                 >
-                                                    {item.title}
+                                                    {item.title}{' '}
+                                                    <button
+                                                        onClick={removeItem}
+                                                        data-id={item.id}
+                                                    >
+                                                        X
+                                                    </button>
                                                 </li>
                                             )}
                                         </Draggable>
@@ -170,4 +190,13 @@ export function Playlist(props: Props) {
 
 const StyledInput = styled.input`
     width: 300px;
+`;
+
+const StyledSearchResultList = styled.ul`
+    list-style: none;
+    max-height: 300px;
+    overflow: auto;
+    padding: 0;
+    user-select: none;
+    cursor: pointer;
 `;
