@@ -1,6 +1,7 @@
 import 'fetch-everywhere';
-import { ChangeEvent, useEffect, useState, useRef } from 'react';
+import { ChangeEvent, useEffect, useState, useRef, Fragment } from 'react';
 import { debounce } from '../utils/debounce';
+import FragmentStore from '../stores/FragmentStore';
 
 interface Props {
     onEpisodeFragmentChange: (url: string) => void;
@@ -117,14 +118,47 @@ export interface Fragment {
 export function EpisodeFragment(props: Props) {
     const [searchResults, setSearchResults] = useState<Fragment[]>([]);
     const searchResultRef = useRef(null);
-    const [, setFragment] = useState<Fragment>(null);
+    const [fragment, setFragment] = useState<Fragment>(
+        FragmentStore.getFragment()
+    );
+
+    const [subscription, setSubscription] = useState(0);
+
+    /**
+     * Remembed to cleanup any subscriptions to Store
+     */
+    useEffect(
+        () => () => {
+            if (subscription) {
+                FragmentStore.unsubscribe(subscription);
+            }
+        },
+        [subscription]
+    );
 
     // Same as componentDidMount
     useEffect(() => {
+        /**
+         * Subscribe to store changes.
+         */
+        setSubscription(
+            FragmentStore.subscribe(() => {
+                setFragment(FragmentStore.getFragment());
+            })
+        );
         if (props.searchString) {
             search(props.searchString);
         }
     }, []);
+
+    /**
+     * When fragment changes
+     */
+    useEffect(() => {
+        if (fragment) {
+            changeFragment(fragment);
+        }
+    }, [fragment]);
 
     /**
      * Set the currently selected item as the fragment.
@@ -134,25 +168,28 @@ export function EpisodeFragment(props: Props) {
             (item) => item.id === parseInt(searchResultRef.current.value, 10)
         );
         if (itemToBeSet) {
-            setFragment(itemToBeSet);
-            props.onEpisodeFragmentChange(
-                `${baseUrl}/podcast/json/${itemToBeSet.id}`
-            );
-            fetch(`${baseUrl}/podcast/json/${itemToBeSet.id}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then((res) => res.json())
-                .then((json: Episode) => {
-                    props.onEpisodeCount(json.episodes.length);
-                })
-                .catch((e) => {
-                    console.error(e);
-                });
+            FragmentStore.setFragment(itemToBeSet);
         } else {
             props.onEpisodeFragmentChange('');
         }
+    }
+
+    function changeFragment(itemToBeSet: Fragment) {
+        props.onEpisodeFragmentChange(
+            `${baseUrl}/podcast/json/${itemToBeSet.id}`
+        );
+        fetch(`${baseUrl}/podcast/json/${itemToBeSet.id}`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then((res) => res.json())
+            .then((json: Episode) => {
+                props.onEpisodeCount(json.episodes.length);
+            })
+            .catch((e) => {
+                console.error(e);
+            });
     }
 
     function onChange(event: ChangeEvent<HTMLInputElement>) {

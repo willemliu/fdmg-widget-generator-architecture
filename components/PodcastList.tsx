@@ -1,4 +1,5 @@
 import { useEffect, useState, ChangeEvent } from 'react';
+import PodcastStore from '../stores/PodcastStore';
 
 export interface PodcastType {
     title: string;
@@ -24,8 +25,36 @@ interface Props {
 
 export function PodcastList(props: Props) {
     const [podcasts, setPodcasts] = useState<PodcastType[]>([]);
+    const [podcast, setPodcast] = useState<PodcastType>(
+        PodcastStore.getPodcast()
+    );
+    const [subscription, setSubscription] = useState(0);
+
+    /**
+     * Remembed to cleanup any subscriptions to Store
+     */
+    useEffect(
+        () => () => {
+            if (subscription) {
+                PodcastStore.unsubscribe(subscription);
+            }
+        },
+        [subscription]
+    );
+
     // Same as componentDidMount
     useEffect(() => {
+        setSubscription(
+            PodcastStore.subscribe(() => {
+                setPodcast(PodcastStore.getPodcast());
+                handlePodcastChange(PodcastStore.getPodcast());
+            })
+        );
+
+        if (podcast) {
+            handlePodcastChange(podcast);
+        }
+
         fetch(`${baseUrl}/widget-podcasts`, {
             headers: {
                 'Content-Type': 'application/json',
@@ -34,9 +63,13 @@ export function PodcastList(props: Props) {
             .then((res) => res.json())
             .then((json: PodcastType[]) => {
                 setPodcasts(json);
-                // Set initial URL
-                props.onPodcastChange(`${baseUrl}${json[0].programUrl}/json`);
-                props.onSponsorLength(json[0].sponsors.length);
+                if (!podcast) {
+                    // Set initial URL
+                    props.onPodcastChange(
+                        `${baseUrl}${json[0].programUrl}/json`
+                    );
+                    props.onSponsorLength(json[0].sponsors.length);
+                }
             });
     }, []);
 
@@ -44,21 +77,27 @@ export function PodcastList(props: Props) {
      * When selecting a different podcast.
      * @param event
      */
-    function handlePodcastChange(event: ChangeEvent<HTMLSelectElement>) {
-        const programUrl = event.currentTarget.value;
-        props.onPodcastChange(`${baseUrl}${programUrl}/json`);
+    function onChange(event: ChangeEvent<HTMLSelectElement>) {
         const podcast = podcasts.find(
-            (podcast) => podcast.programUrl === programUrl
+            (podcast) => podcast.programUrl === event.currentTarget.value
         );
+        PodcastStore.setPodcast(podcast);
+    }
+
+    function handlePodcastChange(podcast: PodcastType) {
+        props.onPodcastChange(`${baseUrl}${podcast.programUrl}/json`);
         props.onSponsorLength(podcast.sponsors.length);
     }
 
     return (
         <div>
-            <select onChange={handlePodcastChange}>
-                {podcasts.map((podcast) => (
-                    <option key={podcast.programUrl} value={podcast.programUrl}>
-                        {podcast.programTitle}
+            <select
+                onChange={onChange}
+                value={podcast ? podcast.programUrl : ''}
+            >
+                {podcasts.map((pc) => (
+                    <option key={pc.programUrl} value={pc.programUrl}>
+                        {pc.programTitle}
                     </option>
                 ))}
             </select>

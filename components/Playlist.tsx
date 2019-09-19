@@ -8,6 +8,7 @@ import {
 import { Fragment } from './EpisodeFragment';
 import { debounce } from '../utils/debounce';
 import styled from 'styled-components';
+import PlaylistStore from '../stores/PlaylistStore';
 
 const searchUrl = process.env.SEARCH_URL;
 
@@ -19,9 +20,34 @@ interface Props {
 
 export function Playlist(props: Props) {
     const [itemList, setItemList] = useState<Fragment[]>([]);
-    const [playlist, setPlaylist] = useState<Fragment[]>([]);
+    const [playlist, setPlaylist] = useState<Fragment[]>(
+        PlaylistStore.getPlaylist()
+    );
+
+    const [subscription, setSubscription] = useState(0);
+
+    /**
+     * Remembed to cleanup any subscriptions to Store
+     */
+    useEffect(
+        () => () => {
+            if (subscription) {
+                PlaylistStore.unsubscribe(subscription);
+            }
+        },
+        [subscription]
+    );
 
     useEffect(() => {
+        /**
+         * Subscribe to store changes.
+         */
+        setSubscription(
+            PlaylistStore.subscribe(() => {
+                setPlaylist(PlaylistStore.getPlaylist());
+            })
+        );
+
         if (props.searchString) {
             search(props.searchString);
         }
@@ -88,7 +114,7 @@ export function Playlist(props: Props) {
             result.destination.index
         );
 
-        setPlaylist(newPlaylist);
+        PlaylistStore.setPlaylist(newPlaylist);
     }
 
     /**
@@ -102,7 +128,7 @@ export function Playlist(props: Props) {
         if (playlist.indexOf(itemToBeAdded) > -1) {
             return;
         }
-        setPlaylist([...playlist, itemToBeAdded]);
+        PlaylistStore.setPlaylist([...playlist, itemToBeAdded]);
     }
 
     /**
@@ -112,7 +138,7 @@ export function Playlist(props: Props) {
     function removeItem(event: React.MouseEvent<HTMLButtonElement>) {
         const id = parseInt(event.currentTarget.getAttribute('data-id'), 10);
         const newPlaylist = [...playlist.filter((item) => item.id !== id)];
-        setPlaylist(newPlaylist);
+        PlaylistStore.setPlaylist(newPlaylist);
     }
 
     return (

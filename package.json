@@ -20,6 +20,7 @@
         "react": "^16.9.0",
         "react-beautiful-dnd": "^11.0.5",
         "react-dom": "^16.9.0",
+        "resub": "^1.2.2",
         "styled-components": "^4.3.2"
     },
     "devDependencies": {
