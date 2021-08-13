@@ -16,7 +16,7 @@
     "license": "ISC",
     "dependencies": {
         "fetch-everywhere": "^1.0.5",
-        "next": "^9.0.5",
+        "next": "^11.1.0",
         "react": "^16.9.0",
         "react-beautiful-dnd": "^11.0.5",
         "react-dom": "^16.9.0"
